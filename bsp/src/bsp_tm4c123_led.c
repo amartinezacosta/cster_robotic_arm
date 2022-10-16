@@ -18,7 +18,7 @@ void bsp_red_led(led_value_t value)
   }
   else
   {
-    GPIOF->DATA &= ~BIT1;
+    GPIOF->DATA &= ~BIT0;
   }
 }
 
