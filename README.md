@@ -15,8 +15,8 @@
   - [x] USB CDC
   - [x] UART
 - [ ] Hibernation Module
- - [ ] Hibernation
- - [ ] RTC
+  - [ ] Hibernation
+  - [ ] RTC
 
  ## RTOS
 

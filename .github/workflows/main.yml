@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ${{matrix.os}}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        type: [Debug, Release]
+
+    steps:
+    - name: checkout code
+      uses: actions/checkout@v3
+      with:
+        submodules: 'true'
+    
+    - name: ARM GCC compiler
+      uses: ryanwinter/arm-none-eabi-gcc@master
+      with:
+        release: '10.3-2021.07'
+    
+    - name: cmake build
+      run: |
+        cmake -Bbuild -G "Unix Makefiles" -DCMAKE_BUILD_TYPE="${{matrix.type}}"
+        cmake --build build
+    

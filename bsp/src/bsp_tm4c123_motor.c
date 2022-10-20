@@ -214,12 +214,32 @@ int32_t bsp_motor_2_encoder(void)
   return count;
 }
 
+/*Code found http://makeatronics.blogspot.com/2013/02/efficiently-reading-quadrature-with.html?m=1*/
 void GPIOB_Handler(void)
 {
   uint8_t mask = GPIOB->MIS;
   uint8_t data = GPIOB->DATA;
 
+  static int8_t lookup_table[] = 
+  {
+    0,-1,1,0,
+    1,0,0,-1,
+    -1,0,0,1,
+    0,1,-1,0
+  };
 
+  static uint8_t encoder_value[3] = {0};
+  encoder_value[0] = encoder_value[0] << 2;
+  encoder_value[1] = encoder_value[1] << 2;
+  encoder_value[2] = encoder_value[2] << 2; 
+
+  encoder_value[0] = encoder_value[0] | ((data & MOTORS_ENCODER_PINS) >> 2);
+  encoder_value[1] = encoder_value[1] | ((data & MOTORS_ENCODER_PINS) >> 2);
+  encoder_value[2] = encoder_value[2] | ((data & MOTORS_ENCODER_PINS) >> 2); 
+
+  encoder_count[0] += lookup_table[encoder_value[0] & 0x0F];
+  encoder_count[1] += lookup_table[encoder_value[1] & 0x0F];
+  encoder_count[2] += lookup_table[encoder_value[2] & 0x0F];
 
   GPIOB->ICR |= mask;
 }
