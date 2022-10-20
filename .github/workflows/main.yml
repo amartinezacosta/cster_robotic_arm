@@ -35,6 +35,6 @@ jobs:
       with:
         name: bin
         path: |
-        build/cster_robotic_arm
-        build/libbsp.a
+          build/cster_robotic_arm
+          build/libbsp.a
     
