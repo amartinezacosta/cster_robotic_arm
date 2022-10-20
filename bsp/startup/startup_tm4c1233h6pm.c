@@ -9,10 +9,10 @@ void MemManage_Handler(void)        __attribute__ ((weak, alias("Default_Handler
 void BusFault_Handler(void)         __attribute__ ((weak, alias("Default_Handler")));
 void UsageFault_Handler(void)       __attribute__ ((weak, alias("Default_Handler")));
 void SecureFault_Handler(void)      __attribute__ ((weak, alias("Default_Handler")));
-void SVC_Handler(void)              __attribute__ ((weak, alias("Default_Handler")));
+void vPortSVCHandler(void)          __attribute__ ((weak, alias("Default_Handler")));
 void DebugMon_Handler(void)         __attribute__ ((weak, alias("Default_Handler")));
-void PendSV_Handler(void)           __attribute__ ((weak, alias("Default_Handler")));
-void SysTick_Handler(void)          __attribute__ ((weak, alias("Default_Handler")));
+void xPortPendSVHandler(void)       __attribute__ ((weak, alias("Default_Handler")));
+void xPortSysTickHandler(void)      __attribute__ ((weak, alias("Default_Handler")));
 
 /*TM4C1233H6PM Exceptions*/
 /*Exceptions 16-24*/
@@ -117,11 +117,11 @@ void(*__vector_table[])(void) __attribute((section(".vector_table"))) =
   0,                    /*8 Reserved*/
   0,                    /*9 Reserved*/
   0,                    /*10 Reserved*/ 
-  SVC_Handler,          /*11 Reserved*/
+  vPortSVCHandler,      /*11 Reserved*/
   DebugMon_Handler,     /*12 Debug Monitor Handler*/
   0,                    /*13 Reserved*/
-  PendSV_Handler,       /*14 PendSV Handler*/
-  SysTick_Handler,      /*15 SysTick Handler*/ 
+  xPortPendSVHandler,   /*14 PendSV Handler*/
+  xPortSysTickHandler,  /*15 SysTick Handler*/ 
 
   /*TM4C1233H6PM Exceptions*/
   GPIOA_Handler,        /*16 GPIOA*/
