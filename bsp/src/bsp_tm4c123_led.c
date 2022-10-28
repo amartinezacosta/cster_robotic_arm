@@ -22,6 +22,11 @@ void bsp_red_led(led_value_t value)
   }
 }
 
+void bsp_red_led_toggle(void)
+{
+  GPIOF->DATA ^= BIT0;
+}
+
 void bsp_green_led(led_value_t value)
 {
   if(value == ON)
@@ -34,6 +39,11 @@ void bsp_green_led(led_value_t value)
   }
 }
 
+void bsp_green_led_toggle(void)
+{
+  GPIOF->DATA ^= BIT1;
+}
+
 void bsp_blue_led(led_value_t value)
 {
   if(value == ON)
@@ -44,7 +54,13 @@ void bsp_blue_led(led_value_t value)
   {
     GPIOF->DATA &=~ BIT2;
   }
-
 }
+
+void bsp_blue_led_toggle(void)
+{
+  GPIOF->DATA ^= BIT2;
+}
+
+
 
 

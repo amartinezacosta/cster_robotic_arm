@@ -6,6 +6,7 @@ static volatile int32_t encoder_count[3];
 static void bsp_motor_pwm_init(void);
 static void bsp_motor_gpio_init(void);
 static void bsp_motor_gpio_power_init(void);
+static void bsp_motor_sleep_init(void);
 
 void bsp_motors_init(void)
 {
@@ -19,14 +20,18 @@ void bsp_motors_init(void)
 
   /*GPIO Port B, C and D enable clock*/
   SYSCTL->RCGCGPIO |= SYSCTL_RCGCGPIO_R1 | 
-                      SYSCTL_RCGCGPIO_R2 | 
+                      SYSCTL_RCGCGPIO_R2 |
+                      SYSCTL_RCGCGPIO_R4 | 
                       SYSCTL_RCGCGPIO_R3 |
                       SYSCTL_RCGCGPIO_R5;
   while( (!(SYSCTL->PRGPIO & SYSCTL_PRGPIO_R1)) && 
          (!(SYSCTL->PRGPIO & SYSCTL_PRGPIO_R2)) &&
          (!(SYSCTL->PRGPIO & SYSCTL_PRGPIO_R3)) &&
+         (!(SYSCTL->PRGPIO & SYSCTL_PRGPIO_R4)) &&
          (!(SYSCTL->PRGPIO & SYSCTL_PRGPIO_R5)));
 
+
+  bsp_motor_sleep_init();
   bsp_motor_pwm_init();
   bsp_motor_gpio_init();
   bsp_motor_gpio_power_init();
@@ -115,7 +120,7 @@ static void bsp_motor_gpio_init(void)
   /*Enable interrupts*/
   GPIOB->IM |= MOTORS_ENCODER_PINS;
 
-  NVIC->ISER[0] |= (1 << 30);
+  NVIC->ISER[0] |= (1 << 1);
 }
 
 static void bsp_motor_gpio_power_init(void)
@@ -123,6 +128,15 @@ static void bsp_motor_gpio_power_init(void)
   GPIOF->DIR |= BIT3;
   GPIOF->DEN |= BIT3;
 
+  GPIOF->DATA &= ~BIT3;
+}
+
+static void bsp_motor_sleep_init(void)
+{
+  GPIOE->DIR |= (BIT2 | BIT3);
+  GPIOE->DEN |= (BIT2 | BIT3);
+
+  GPIOE->DATA |= (BIT2 | BIT3);
 }
 
 void bsp_motor_0_speed(uint32_t speed, motor_dir_t dir)
@@ -185,6 +199,16 @@ void bsp_motor_power_disable(void)
   GPIOF->DATA &= ~BIT3;
 
   /*TODO: delay for power supply voltage to settle*/
+}
+
+void bsp_motor_sleep_enable(void)
+{
+  GPIOE->DATA &= ~(BIT2 | BIT3);
+}
+
+void bsp_motor_sleep_disable(void)
+{
+  GPIOE->DATA |= (BIT2 | BIT3);
 }
 
 int32_t bsp_motor_0_encoder(void)

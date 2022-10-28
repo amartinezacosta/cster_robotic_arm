@@ -36,5 +36,8 @@ int32_t bsp_motor_0_encoder(void);
 int32_t bsp_motor_1_encoder(void);
 int32_t bsp_motor_2_encoder(void);
 
+void bsp_motor_sleep_enable(void);
+void bsp_motor_sleep_disable(void);
+
 
 #endif

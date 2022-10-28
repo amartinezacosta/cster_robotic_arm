@@ -12,4 +12,8 @@ void bsp_red_led(led_value_t value);
 void bsp_green_led(led_value_t value);
 void bsp_blue_led(led_value_t value);
 
+void bsp_red_led_toggle(void);
+void bsp_green_led_toggle(void);
+void bsp_blue_led_toggle(void);
+
 #endif

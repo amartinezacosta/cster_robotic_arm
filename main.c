@@ -12,24 +12,24 @@ pid_t motor_0_pid,
 
 void motors_position_control_task(void *pvParamaters)
 {
-  const TickType_t xDelay = 20 / portTICK_PERIOD_MS;
+  const TickType_t xDelay = 250 / portTICK_PERIOD_MS;
 
   pid_init(&motor_0_pid,
-           1.0f,
+           100000.0f,
            0.0f,
            0.0f,
            80000.0f,
            8000.0f);
 
   pid_init(&motor_1_pid,
-           1.0f,
+           100000.0f,
            0.0f,
            0.0f,
            80000.0f,
            8000.0f);
 
   pid_init(&motor_2_pid,
-           1.0f,
+           100000.0f,
            0.0f,
            0.0f,
            80000.0f,
@@ -38,6 +38,13 @@ void motors_position_control_task(void *pvParamaters)
   /*Enable power to the motors, wait for voltage to settle*/
   bsp_motor_power_enable();
   vTaskDelay(3 / portTICK_PERIOD_MS);
+
+  /*Disable sleep for motors*/
+  bsp_motor_sleep_disable();
+
+  pid_set_point(&motor_0_pid, 100000);
+  pid_set_point(&motor_1_pid, 100000);
+  pid_set_point(&motor_2_pid, 100000);
 
   for( ;; )
   {
@@ -48,15 +55,15 @@ void motors_position_control_task(void *pvParamaters)
 
     int32_t motor_0_output = (int32_t)pid_update(&motor_0_pid,
                                                  (float)motor_0_encoder,
-                                                 0.02f);
+                                                 0.250f);
 
-    int32_t motor_1_output = (int32_t)pid_update(&motor_0_pid,
+    int32_t motor_1_output = (int32_t)pid_update(&motor_1_pid,
                                                  (float)motor_1_encoder,
-                                                 0.02f);
+                                                 0.250f);
 
-    int32_t motor_2_output = (int32_t)pid_update(&motor_0_pid,
+    int32_t motor_2_output = (int32_t)pid_update(&motor_2_pid,
                                                  (float)motor_2_encoder,
-                                                 0.02f);
+                                                 0.250f);
 
     /*Find motor rotation direction*/
     motor_dir_t motor_0_dir = (motor_0_output < 0) ? CLOCKWISE : COUNTER_CLOCKWISE;
@@ -65,8 +72,10 @@ void motors_position_control_task(void *pvParamaters)
 
     /*Set PWM output to control motor speed*/
     bsp_motor_0_speed(abs(motor_0_output), motor_0_dir);
-    bsp_motor_1_speed(abs(motor_0_output), motor_1_dir);
-    bsp_motor_2_speed(abs(motor_0_output), motor_2_dir);
+    bsp_motor_1_speed(abs(motor_1_output), motor_1_dir);
+    bsp_motor_2_speed(abs(motor_2_output), motor_2_dir);
+
+    bsp_blue_led_toggle();
 
     vTaskDelay(xDelay);
   }
