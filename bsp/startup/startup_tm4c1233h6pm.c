@@ -322,14 +322,19 @@ __attribute__((noreturn)) void Reset_Handler(void)
 
   /*2. Select the crystal value (XTAL) and oscillator source,
        and clear the PWRDN bit in RCC/RCC2*/
+  SYSCTL->RCC &= ~SYSCTL_RCC_XTAL_M;
   SYSCTL->RCC |= SYSCTL_RCC_XTAL_16MHZ;
+
+  SYSCTL->RCC2 &= ~SYSCTL_RCC2_OSCSRC2_M;
   SYSCTL->RCC2 |= SYSCTL_RCC2_OSCSRC2_MO;
   SYSCTL->RCC2 &= ~SYSCTL_RCC2_PWRDN2;
 
   /*3. Select the desired system divider (SYSDIV) in RCC/RCC2
        and set the USESYS bit in RCC.*/
-  SYSCTL->RCC2 |= SYSCTL_RCC2_DIV400 | 
-                  (SYSCTL_RCC2_SYSDIV2_M & 0x02);
+  SYSCTL->RCC2 |= SYSCTL_RCC2_DIV400;
+  SYSCTL->RCC2 &= ~SYSCTL_RCC2_SYSDIV2_M;
+  SYSCTL->RCC2 |= (0x02 << 23);
+
   SYSCTL->RCC2 &= ~SYSCTL_RCC2_SYSDIV2LSB;
   SYSCTL->RCC |= SYSCTL_RCC_USESYSDIV;  
 

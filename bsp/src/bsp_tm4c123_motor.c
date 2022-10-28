@@ -3,9 +3,9 @@
 
 static volatile int32_t encoder_count[3];
 
-void bsp_motor_pwm_init(void);
-void bsp_motor_gpio_init(void);
-void bsp_motor_gpio_power_init(void);
+static void bsp_motor_pwm_init(void);
+static void bsp_motor_gpio_init(void);
+static void bsp_motor_gpio_power_init(void);
 
 void bsp_motors_init(void)
 {
@@ -32,7 +32,7 @@ void bsp_motors_init(void)
   bsp_motor_gpio_power_init();
 }
 
-void bsp_motor_pwm_init(void)
+static void bsp_motor_pwm_init(void)
 {
     /*Select alternate function and set as digital pin*/
   GPIOC->AFSEL |= MOTOR_0_PWM_PINS | MOTOR_1_PWM_PINS;
@@ -98,7 +98,7 @@ void bsp_motor_pwm_init(void)
   WTIMER2->CTL |= TIMER_CTL_TBEN;
 }
 
-void bsp_motor_gpio_init(void)
+static void bsp_motor_gpio_init(void)
 {
   /*Set GPIO direction*/
   GPIOB->DIR &= ~MOTORS_ENCODER_PINS;
@@ -118,7 +118,7 @@ void bsp_motor_gpio_init(void)
   NVIC->ISER[0] |= (1 << 30);
 }
 
-void bsp_motor_gpio_power_init(void)
+static void bsp_motor_gpio_power_init(void)
 {
   GPIOF->DIR |= BIT3;
   GPIOF->DEN |= BIT3;

@@ -4,4 +4,5 @@ void bsp_init(void)
 {
   bsp_led_init();
   bsp_motors_init();
+  bsp_uart_init();
 }

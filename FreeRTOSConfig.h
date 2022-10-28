@@ -2,7 +2,7 @@
 #define FREERTOS_CONFIG_H
 
 #define configMINIMAL_STACK_SIZE                128
-#define configSYSTICK_CLOCK_HZ                  80000000UL
+#define configCPU_CLOCK_HZ                      80000000UL
 #define configTICK_RATE_HZ                      1000UL
 #define configMAX_PRIORITIES                    5
 #define configUSE_PREEMPTION                    1
@@ -20,5 +20,6 @@
 #define configUSE_TICK_HOOK                     0
 
 /*Optional functions*/
+#define INCLUDE_vTaskDelay                     1
 
 #endif
