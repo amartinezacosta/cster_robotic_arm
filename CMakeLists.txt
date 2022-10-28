@@ -8,6 +8,7 @@ add_library(bsp
     bsp/src/bsp_tm4c123.c
     bsp/src/bsp_tm4c123_led.c
     bsp/src/bsp_tm4c123_motor.c
+    bsp/src/bsp_tm4c123_uart.c
     bsp/startup/startup_tm4c1233h6pm.c)
 
 add_library(freertos
@@ -22,6 +23,10 @@ add_library(freertos
     third_party/FreeRTOS-Kernel/portable/MemMang/heap_1.c
     )
 
+add_library(control
+  control/src/pid.c
+  )
+
 target_compile_definitions(bsp PUBLIC TM4C1233H6PM)
 target_include_directories(bsp PRIVATE
     bsp/include/bsp
@@ -35,12 +40,17 @@ target_include_directories(freertos PRIVATE
     .
     )
 
+target_include_directories(control PRIVATE
+  control/include
+  )
+
 set(LINKER_SCRIPT "${CMAKE_CURRENT_LIST_DIR}/bsp/linker_scripts/tm4c1233h6pm_minimal.ld")
 add_executable(cster_robotic_arm main.c)
 target_link_options(cster_robotic_arm PRIVATE "-T${LINKER_SCRIPT}")
-target_link_libraries(cster_robotic_arm bsp freertos)
+target_link_libraries(cster_robotic_arm bsp freertos control)
 target_include_directories(cster_robotic_arm PRIVATE 
     bsp/include/bsp
+    control/include
     third_party/FreeRTOS-Kernel/include
     third_party/FreeRTOS-Kernel/portable/GCC/ARM_CM4F
     .
