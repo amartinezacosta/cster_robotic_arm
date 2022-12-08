@@ -4,12 +4,15 @@ set(CMAKE_TOOLCHAIN_FILE cmake/toolchain-arm-none-eabi.cmake)
 
 project(cster_robotic_arm)
 
+option(BUILD_TESTS "Build tests programs" OFF)
+
 add_library(bsp
     bsp/src/bsp_tm4c123.c
     bsp/src/bsp_tm4c123_led.c
     bsp/src/bsp_tm4c123_motor.c
     bsp/src/bsp_tm4c123_uart.c
-    bsp/startup/startup_tm4c1233h6pm.c)
+    bsp/startup/startup_tm4c1233h6pm.c
+    )
 
 add_library(freertos
     third_party/FreeRTOS-Kernel/croutine.c
@@ -55,6 +58,11 @@ target_include_directories(cster_robotic_arm PRIVATE
     third_party/FreeRTOS-Kernel/portable/GCC/ARM_CM4F
     .
     )
+
+#Compile tests
+if(BUILD_TESTS)
+  add_subdirectory(tests)
+endif()
 
 # Custom targets to flash and debug the board
 add_custom_target(flash

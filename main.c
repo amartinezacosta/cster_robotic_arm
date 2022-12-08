@@ -15,21 +15,21 @@ void motors_position_control_task(void *pvParamaters)
   const TickType_t xDelay = 250 / portTICK_PERIOD_MS;
 
   pid_init(&motor_0_pid,
-           100000.0f,
+           1.0f,
            0.0f,
            0.0f,
            80000.0f,
            8000.0f);
 
   pid_init(&motor_1_pid,
-           100000.0f,
+           1.0f,
            0.0f,
            0.0f,
            80000.0f,
            8000.0f);
 
   pid_init(&motor_2_pid,
-           100000.0f,
+           1.0f,
            0.0f,
            0.0f,
            80000.0f,

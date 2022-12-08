@@ -39,7 +39,7 @@ void bsp_motors_init(void)
 
 static void bsp_motor_pwm_init(void)
 {
-    /*Select alternate function and set as digital pin*/
+  /*Select alternate function and set as digital pin*/
   GPIOC->AFSEL |= MOTOR_0_PWM_PINS | MOTOR_1_PWM_PINS;
   GPIOC->DEN |= MOTOR_0_PWM_PINS | MOTOR_1_PWM_PINS; 
   GPIOD->AFSEL |= MOTOR_2_PWM_PINS;

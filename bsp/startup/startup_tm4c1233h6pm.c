@@ -276,6 +276,9 @@ void HardFault_debug(uint32_t *stack)
   /*TODO: Visualize this fault?*/
 
   /*Reset the system*/
+
+  /*Do not return*/
+  for( ;; );
 }
 
 __attribute__((naked, noreturn)) void HardFault_Handler(void)
@@ -315,7 +318,7 @@ __attribute__((noreturn)) void Reset_Handler(void)
   /*Enable floating point unit*/
   SCB->CPACR = ((0x03 << 22) | (0x03 << 20)); 
 
-  /*Initialize TM4C1233H6PM system*/
+  /*Initialize TM4C1233H6PM clock system*/
   /*1. Bypass the PLL and system clock divider*/
   SYSCTL->RCC2 |= SYSCTL_RCC2_USERCC2 | SYSCTL_RCC2_BYPASS2;
   SYSCTL->RCC &= ~SYSCTL_RCC_USESYSDIV;
@@ -344,6 +347,26 @@ __attribute__((noreturn)) void Reset_Handler(void)
 
   /*5. Enable the PLL by clearing the BYPASS bit*/
   SYSCTL->RCC2 &= ~SYSCTL_RCC2_BYPASS2;
+
+  /*Initialize TM4C1233H6PM RTC*/
+  /*1. Write 0x0000.0040 to the HIBCTL register at offset 0x010 
+     to enable 32.768-kHz Hibernation oscillator.*/
+  HIB->CTL = HIB_CTL_CLK32EN;
+
+  /*2. Write the required RTC match value to the HIBRTCM0 register 
+     at offset 0x004 and the RTCSSM field in the HIBRTCSS 
+     register at offset 0x028.*/
+  
+  /*3. Write the required RTC load value to the HIBRTCLD register 
+     at offset 0x00C.*/
+  HIB->RTCLD = 0x00000000;
+
+  /*4. Set the required RTC match interrupt mask in the RTCALT0 
+     in the HIBIM register at offset 0x014.*/
+
+  /*5. Write 0x0000.0041 to the HIBCTL register at offset 0x010 
+     to enable the RTC to begin counting.*/
+  HIB->CTL |= HIB_CTL_RTCEN;
 
   /*Call main application*/
   main();
