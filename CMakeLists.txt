@@ -11,6 +11,7 @@ add_library(bsp
     bsp/src/bsp_tm4c123_led.c
     bsp/src/bsp_tm4c123_motor.c
     bsp/src/bsp_tm4c123_uart.c
+    bsp/src/bsp_tm4c123_udma.c
     bsp/startup/startup_tm4c1233h6pm.c
     )
 
@@ -59,19 +60,26 @@ target_include_directories(cster_robotic_arm PRIVATE
     .
     )
 
-#Compile tests
-if(BUILD_TESTS)
-  add_subdirectory(tests)
+# Custom targets to flash and debug the board
+set(OPENOCD_SCRIPT_PATH "")
+if(CMAKE_HOST_SYSTEM MATCHES Windows)
+  set(OPENOCD_SCRIPT_PATH "C:/openocd/share/openocd/scripts/board/ti_ek-tm4c123gxl.cfg")
+elseif(CMAKE_HOST_SYSTEM MATCHES Linux)
+  set(OPENOCD_SCRIPT_PATH "/usr/local/share/openocd/scripts/board/ti_ek-tm4c123gxl.cfg")
 endif()
 
-# Custom targets to flash and debug the board
 add_custom_target(flash
-    COMMAND openocd -f /usr/local/share/openocd/scripts/board/ti_ek-tm4c123gxl.cfg
+    COMMAND openocd -f "${OPENOCD_SCRIPT_PATH}"
     -c "program ${CMAKE_BINARY_DIR}/cster_robotic_arm reset exit"
     DEPENDS cster_robotic_arm)
 
 add_custom_target(debug
-    COMMAND openocd -f /usr/local/share/openocd/scripts/board/ti_ek-tm4c123gxl.cfg &
+    COMMAND openocd -f /"${OPENOCD_SCRIPT_PATH}" &
     arm-none-eabi-gdb ${CMAKE_BINARY_DIR}/cster_robotic_arm 
     -ex "target extended-remote localhost:3333" -ex "load" -ex "break main"
     DEPENDS cster_robotic_arm)
+
+#Compile tests
+if(BUILD_TESTS)
+  add_subdirectory(tests)
+endif()

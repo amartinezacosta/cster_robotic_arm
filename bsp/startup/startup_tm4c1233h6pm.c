@@ -352,6 +352,7 @@ __attribute__((noreturn)) void Reset_Handler(void)
   /*1. Write 0x0000.0040 to the HIBCTL register at offset 0x010 
      to enable 32.768-kHz Hibernation oscillator.*/
   HIB->CTL = HIB_CTL_CLK32EN;
+  while(!(HIB->CTL & HIB_CTL_WRC));
 
   /*2. Write the required RTC match value to the HIBRTCM0 register 
      at offset 0x004 and the RTCSSM field in the HIBRTCSS 
@@ -360,6 +361,7 @@ __attribute__((noreturn)) void Reset_Handler(void)
   /*3. Write the required RTC load value to the HIBRTCLD register 
      at offset 0x00C.*/
   HIB->RTCLD = 0x00000000;
+  while(!(HIB->CTL & HIB_CTL_WRC));
 
   /*4. Set the required RTC match interrupt mask in the RTCALT0 
      in the HIBIM register at offset 0x014.*/
@@ -367,6 +369,7 @@ __attribute__((noreturn)) void Reset_Handler(void)
   /*5. Write 0x0000.0041 to the HIBCTL register at offset 0x010 
      to enable the RTC to begin counting.*/
   HIB->CTL |= HIB_CTL_RTCEN;
+  while(!(HIB->CTL & HIB_CTL_WRC));
 
   /*Call main application*/
   main();

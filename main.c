@@ -75,20 +75,20 @@ void motors_position_control_task(void *pvParamaters)
     bsp_motor_1_speed(abs(motor_1_output), motor_1_dir);
     bsp_motor_2_speed(abs(motor_2_output), motor_2_dir);
 
-    bsp_blue_led_toggle();
+    //bsp_blue_led_toggle();
 
     vTaskDelay(xDelay);
   }
 }
 
-void serial_terminal_task(void *pvParameters)
+void serial_shell_task(void *pvParameters)
 {
   const char str[] = "cster robotic arm\r\n";
   const TickType_t xDelay = 500 / portTICK_PERIOD_MS;
 
   for( ;; )
   {
-    bsp_uart_write((uint8_t*)str, strlen(str));
+    //bsp_uart_write((uint8_t*)str, strlen(str));
     vTaskDelay(xDelay);
   }
 }
@@ -106,8 +106,8 @@ int main(void)
     1,
     NULL);
 
-  xTaskCreate(serial_terminal_task,
-    "serial_terminal_task",
+  xTaskCreate(serial_shell_task,
+    "serial_shell_task",
     configMINIMAL_STACK_SIZE,
     NULL,
     0,
