@@ -12,75 +12,93 @@ void ringbuffer_ctor(ringbuffer_t * const me,
 }
 
 uint32_t ringbuffer_push(ringbuffer_t * const me,
-                     uint8_t const * const data,
-                     uint32_t const size)
+                     uint8_t const c)
 {
-  uint32_t n = 0;
-  for(; n < size; n++)
+  uint32_t result;
+  uint32_t head = me->head + 1;
+
+  if(head == me->size)
   {
-    if(ringbuffer_full(me)) break;
-
-    uint32_t head = me->head;
-    me->buffer[head] = data[n];
-
-    head = (head + 1) % me->size;
-
-    __disable_irq();
-    me->head = head;
-    __enable_irq();
+    head = 0;
   }
 
-  return n;
+  if(head != me->tail)
+  {
+    me->buffer[me->head] = c;
+    me->head = head;
+
+    result = RINGBUFFER_PUSHED;
+  }
+  else
+  {
+    result = RINGBUFFER_NOT_PUSHED;
+  }
+
+  return result;
 }
 
 uint32_t ringbuffer_pop(ringbuffer_t * const me,
-                        uint8_t * const data,
-                        uint32_t const size)
+                        uint8_t * c)
 {
-  uint32_t n = 0;
-  for(; n < size; n++)
+  uint32_t result;
+  uint32_t tail = me->tail;
+
+  if(me->head != tail)
   {
-    if(ringbuffer_empty(me)) break;
-
-    uint32_t tail = me->tail;
-    data[n] = me->buffer[tail];
-
-    tail = (tail + 1) % me->size;
-
-    __disable_irq();
+    *c = me->buffer[tail];
+    ++tail;
+    if(tail == me->size)
+    {
+      tail = 0;
+    }
     me->tail = tail;
-    __enable_irq();
+
+    result = RINGBUFFER_POPPED;
+  }
+  else
+  {
+    result = RINGBUFFER_NOT_POPPED;
   }
 
-  return n;
+  return result;
 }
 
-uint32_t ringbuffer_full(ringbuffer_t * const me)
+uint32_t ringbuffer_free(ringbuffer_t * const me)
 {
   uint32_t head = me->head;
   uint32_t tail = me->tail;
+  uint32_t free;
 
-  return ((((head + 1) % me->size) == tail) ? 1 : 0);
-}
+  if(head == tail)
+  {
+    free = me->size - 1;
+  }
+  else if(head < tail)
+  {
+    free = tail - head - 1;
+  }
+  else
+  {
+    free = me->size + tail - head - 1;
+  }
 
-uint32_t ringbuffer_empty(ringbuffer_t * const me)
-{
-  uint32_t head = me->head;
-  uint32_t tail = me->tail;
-
-  return ((head == tail) ? 1 : 0);
+  return free;
 }
 
 uint32_t ringbuffer_available(ringbuffer_t * const me)
 {
   uint32_t head = me->head;
   uint32_t tail = me->tail;
+  uint32_t available;
 
-  return ((head >= tail) ? (head - tail) :
-          (me->size - (tail - head)));
-}
+  if(head >= tail)
+  {
+    available = head - tail;
+  }
+  else
+  {
+    available = me->size - (tail - head);
+  }
 
-uint32_t ringbuffer_space(ringbuffer_t * const me)
-{
-  return (me->size - ringbuffer_available(me));
+  return available;
 }

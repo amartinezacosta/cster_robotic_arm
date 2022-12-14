@@ -12,6 +12,7 @@ add_library(bsp
     bsp/src/bsp_tm4c123_motor.c
     bsp/src/bsp_tm4c123_uart.c
     bsp/src/bsp_tm4c123_udma.c
+    bsp/src/bsp_tm4c123_ringbuffer.c
     bsp/startup/startup_tm4c1233h6pm.c
     )
 

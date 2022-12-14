@@ -70,16 +70,21 @@ void bsp_uart_init(void)
 
 uint32_t bsp_uart_write(uint8_t* data, uint32_t size)
 {
-  uint32_t written = ringbuffer_push(uart0_tx_ringbuffer, data, size);
+  uint32_t written = 0;
+  for(; written < size; written++)
+  {
+    if(ringbuffer_push(&uart0_tx_ringbuffer, data[written])
+        == RINGBUFFER_NOT_PUSHED) break;
+  }
+
   if(written)
   {
     NVIC->ISER[0] &= ~(1 << UART0_IRQn);
 
     uint8_t c;
     while(!(UART0->FR & UART_FR_TXFF) &&
-          !(ringbuffer_empty(&uart0_tx_ringbuffer)))
+          (ringbuffer_pop(&uart0_tx_ringbuffer, &c) != RINGBUFFER_NOT_POPPED))
     {
-      ringbuffer_pop(&uart0_tx_ringbuffer, &c, 1);
       UART0->DR = c;
     }
 
@@ -93,7 +98,14 @@ uint32_t bsp_uart_write(uint8_t* data, uint32_t size)
 
 uint32_t bsp_uart_read(uint8_t* data, uint32_t size)
 {
-  return 0;
+  uint32_t read = 0;
+  for(; read < size; read++)
+  {
+    if(ringbuffer_pop(&uart0_rx_ringbuffer, &data[read])
+        == RINGBUFFER_NOT_POPPED) break;
+  }
+
+  return read;
 }
 
 
@@ -108,18 +120,18 @@ void UART0_Handler(void)
   if(status & UART_MIS_RXMIS)
   {
     c = UART0->DR;
-    ringbuffer_push(uart0_rx_ringbuffer, &c, 1);
+    ringbuffer_push(&uart0_rx_ringbuffer, c);
   }
   else if(status & UART_MIS_TXMIS)
   {
     while(!(UART0->FR & UART_FR_TXFF) &&
-          !(ringbuffer_empty(&uart0_tx_ringbuffer)))
+          (ringbuffer_pop(&uart0_tx_ringbuffer, &c) != RINGBUFFER_NOT_POPPED))
     {
-      ringbuffer_pop(&uart0_tx_ringbuffer, &c, 1);
       UART0->DR = c;
     }
 
-    if(ringbuffer_empty(&uart0_tx_ringbuffer))
+    /*Buffer full?*/
+    if(ringbuffer_free(&uart0_tx_ringbuffer) == 0)
     {
       UART0->IM &= ~UART_IM_TXIM;
     }
