@@ -68,7 +68,7 @@ void bsp_uart_init(void)
 }
 
 
-uint32_t bsp_uart_write(uint8_t* data, uint32_t size)
+uint32_t bsp_uart_write(uint8_t const * data, uint32_t const size)
 {
   uint32_t written = 0;
   for(; written < size; written++)
@@ -96,7 +96,7 @@ uint32_t bsp_uart_write(uint8_t* data, uint32_t size)
 }
 
 
-uint32_t bsp_uart_read(uint8_t* data, uint32_t size)
+uint32_t bsp_uart_read(uint8_t* data, uint32_t const size)
 {
   uint32_t read = 0;
   for(; read < size; read++)

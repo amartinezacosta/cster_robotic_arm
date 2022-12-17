@@ -7,7 +7,7 @@
 #define UART0_TX_BUFFER_SIZE    64
 
 void bsp_uart_init(void);
-uint32_t bsp_uart_write(uint8_t *data, uint32_t size);
-uint32_t bsp_uart_read(uint8_t *data, uint32_t size);
+uint32_t bsp_uart_write(uint8_t const * data, uint32_t const size);
+uint32_t bsp_uart_read(uint8_t *data, uint32_t const size);
 
 #endif
